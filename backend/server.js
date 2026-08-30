@@ -2,10 +2,13 @@ const express = require("express");
 
 const db = require("./config/db");
 const app = express();
+const authRoutes = require("./routes/authRoutes");
+
 
 const PORT = 5000;
 
 app.use(express.json());
+app.use("/api/auth/", authRoutes);
 
 app.get("/", (req, res) => {
     res.send("Online Voting System is Running");
