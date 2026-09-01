@@ -1,14 +1,18 @@
 const express = require("express");
+const dotenv = require("dotenv");
+dotenv.config();
 
 const db = require("./config/db");
 const app = express();
 const authRoutes = require("./routes/authRoutes");
+const userRoutes = require("./routes/userRoutes");
 
 
 const PORT = 5000;
 
 app.use(express.json());
 app.use("/api/auth/", authRoutes);
+app.use("/api/users", userRoutes);
 
 app.get("/", (req, res) => {
     res.send("Online Voting System is Running");
