@@ -23,9 +23,10 @@ CREATE TABLE elections (
 
 CREATE TABLE candidates (
     id INT PRIMARY KEY AUTO_INCREMENT,
-    name VARCHAR(100) NOT NULL,
-    party VARCHAR(100),
     election_id INT NOT NULL,
+    name VARCHAR(100) NOT NULL,
+    description VARCHAR(255),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
     FOREIGN KEY (election_id)
         REFERENCES elections(id)
