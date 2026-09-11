@@ -8,6 +8,7 @@ const authRoutes = require("./routes/authRoutes");
 const userRoutes = require("./routes/userRoutes");
 const electionRoutes = require("./routes/electionRoutes");
 const candidateRoutes = require("./routes/candidateRoutes");
+const voteRoutes = require("./routes/voteRoutes");
 
 
 const PORT = 5000;
@@ -17,6 +18,7 @@ app.use("/api/auth/", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/elections", electionRoutes);
 app.use("/api/candidates", candidateRoutes);
+app.use("/api/votes", voteRoutes);
 
 app.get("/", (req, res) => {
     res.send("Online Voting System is Running");

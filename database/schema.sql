@@ -33,6 +33,7 @@ CREATE TABLE candidates (
         ON DELETE CASCADE
 );
 
+
 CREATE TABLE votes (
     id INT PRIMARY KEY AUTO_INCREMENT,
     user_id INT NOT NULL,
@@ -41,14 +42,16 @@ CREATE TABLE votes (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
     FOREIGN KEY (user_id)
-        REFERENCES users(id),
+        REFERENCES users(id)
+        ON DELETE CASCADE,
 
     FOREIGN KEY (election_id)
-        REFERENCES elections(id),
+        REFERENCES elections(id)
+        ON DELETE CASCADE,
 
     FOREIGN KEY (candidate_id)
-        REFERENCES candidates(id),
+        REFERENCES candidates(id)
+        ON DELETE CASCADE,
 
-    CONSTRAINT unique_user_election
-        UNIQUE (user_id, election_id)
+    UNIQUE (user_id, election_id)
 );
