@@ -1,7 +1,11 @@
+const { Connection } = require("mysql2/promise");
 const db = require("../config/db");
 
 // Cast vote
 const castVote = async (req, res) => {
+
+    const connection = await db.getConnection();
+
     try{
         const user_id = req.user.id;
 
@@ -14,11 +18,14 @@ const castVote = async (req, res) => {
             });
         }
 
+        await connection.beginTransaction();
+
         //check whether election exists
-        const [elections] = await db.execute(
+        const [elections] = await connection.execute(
             `SELECT id, status, start_date, end_date
             FROM elections
-            WHERE id = ?`,
+            WHERE id = ?
+            FOR UPDATE`,
             [election_id]
         );
 
@@ -32,13 +39,38 @@ const castVote = async (req, res) => {
 
         //check election status
         if(election.status !== "active"){
+
+            await connection.rollback(); 
+
             return res.status(400).json({
                 message: "Voting is not currently active for this election"
             });
         }
 
+        //check election date
+
+        const currentTime = new Date();
+
+        const startDate = new Date(election.start_date);
+        const endDate = new Date(election.end_date);
+
+        if(currentTime < startDate){
+            await connection.rollback();
+            return res.status(400).json({
+                message: "Voting has not started yet"
+            });
+        }
+
+        if(currentTime > endDate){
+            await connection.rollback();
+
+            return res.status(400).json({
+                message: "Voting has ended"
+            });
+        }
+
         //check whether candidate exists
-        const [candidates] = await db.execute(
+        const [candidates] = await connection.execute(
             `SELECT id, election_id
             FROM candidates
             WHERE id = ?`,
@@ -46,6 +78,8 @@ const castVote = async (req, res) => {
         );
 
         if(candidates.length === 0){
+
+            await connection.rollback();
             return res.status(404).json({
                 message: "Candidate not found"
             });
@@ -54,40 +88,51 @@ const castVote = async (req, res) => {
         const candidate = candidates[0];
 
         //Make sure candidate belongs to this election
-        if(candidate.election_id != election_id){
+        if( Number(candidates[0].election_id) !==
+            Number(election_id)){
+
+                await connection.rollback();
+
             return res.status(400).json({
                 message: "Candidate does not belong to this election"
             });
         }
 
         //check whether user already voted
-        const [existingVote] = await db.execute(
+        const [existingVote] = await connection.execute(
             `SELECT id
             FROM votes
             WHERE user_id = ?
-            AND election_id = ?`,
+            AND election_id = ?
+            FOR UPDATE`,
             [user_id,election_id]
         );
 
         if(existingVote.length>0){
+
+            await connection.rollback();
             return res.status(409).json({
                 message: "You have already voted in this election"
             });
         }
 
         //Insert vote
-        const [result] = await db.execute(
+        const [result] = await connection.execute(
             `INSERT INTO votes
             (user_id, election_id, candidate_id)
             VALUES (?, ?, ?)`,
             [user_id, election_id, candidate_id]
         );
 
+        await connection.commit();
+
         res.status(201).json({
             message: "Vote cast successfully",
             voteId: result.insertId
         });
     } catch(error){
+
+        await connection.rollback();
         console.error("Cast vote error:",error);
 
         //Handle duplicate vote at database level
@@ -100,6 +145,10 @@ const castVote = async (req, res) => {
         res.status(500).json({
             message: "Server error"
         });
+    }
+    finally{
+        // Release connection back to pool
+        connection.release();
     }
 };
 
