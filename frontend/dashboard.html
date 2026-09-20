@@ -21,24 +21,32 @@
 
 <body>
 
-    <div class="container">
+     <header class="dashboard-header">
+        <h1>Online Voting System</h1>
+        <div>
+            <span id="welcome">Welcome!</span>
+            <button id="logoutBtn" class="logout-btn">Logout</button>
+        </div>
+    </header>
 
-        <h1>Voting Dashboard</h1>
+    <main class="dashboard-container">
+        <section>
+            <h2>Available Elections</h2>
+            <p>Choose an election to view its candidates.</p>
 
-        <p id="welcome"></p>
+            <p id="electionMessage" class="message"></p>
+            <div id="elections" class="election-grid"></div>
+        </section>
 
-        <button id="logoutBtn">
-            Logout
-        </button>
-
-        <h2>Elections</h2>
-
-        <div id="elections"></div>
-
-    </div>
+        <section id="candidateSection" class="candidate-section" hidden>
+            <h2 id="candidateHeading">Candidates</h2>
+            <p id="candidateMessage" class="message"></p>
+            <div id="candidates" class="candidate-grid"></div>
+        </section>
+    </main>
 
     <script src="js/dashboard.js"></script>
-
+    
 </body>
 
 </html>
