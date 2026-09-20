@@ -176,3 +176,21 @@ a {
         font-size: 20px;
     }
 }
+
+#confirmVoteBtn {
+    margin-top: 20px;
+    background: #15803d;
+}
+
+#confirmVoteBtn:hover {
+    background: #166534;
+}
+
+#confirmVoteBtn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+#voteMessage {
+    font-weight: 500;
+}

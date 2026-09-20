@@ -5,23 +5,17 @@
 
     <meta charset="UTF-8">
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Dashboard</title>
 
-    <link
-        rel="stylesheet"
-        href="css/style.css"
-    >
+    <link rel="stylesheet" href="css/style.css">
 
 </head>
 
 <body>
 
-     <header class="dashboard-header">
+    <header class="dashboard-header">
         <h1>Online Voting System</h1>
         <div>
             <span id="welcome">Welcome!</span>
@@ -42,11 +36,17 @@
             <h2 id="candidateHeading">Candidates</h2>
             <p id="candidateMessage" class="message"></p>
             <div id="candidates" class="candidate-grid"></div>
+
+            <button id="confirmVoteBtn" hidden>
+                Confirm Vote
+            </button>
+
+            <p id="voteMessage" class="message" role="status"></p>
         </section>
     </main>
 
     <script src="js/dashboard.js"></script>
-    
+
 </body>
 
 </html>
