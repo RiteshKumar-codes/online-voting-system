@@ -15,7 +15,7 @@ const cors = require("cors");
 
 app.use(express.json());
 app.use(cors({
-  origin: "https://online-voting-system-3-2faz.onrender.com/", // no trailing slash
+  origin: "https://online-voting-system-3-2faz.onrender.com", // no trailing slash
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"]
 }));
