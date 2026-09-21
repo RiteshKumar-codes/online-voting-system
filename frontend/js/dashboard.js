@@ -1,4 +1,4 @@
-const API_URL = "https://online-voting-system-vb11.onrender.com/"
+const API_URL = "https://online-voting-system-vb11.onrender.com"
 
 const token = localStorage.getItem("token");
 
