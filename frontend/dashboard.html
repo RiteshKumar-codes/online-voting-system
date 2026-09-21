@@ -43,8 +43,32 @@
 
             <p id="voteMessage" class="message" role="status"></p>
         </section>
+
+
+        <section id="resultsSection" class="results-section">
+            <h2>Election Results</h2>
+            <p>Select an election to view its results.</p>
+
+            <div id="resultsElectionList" class="election-grid"></div>
+
+            <div id="resultsMessage" class="message" role="status"></div>
+
+            <div id="resultsDashboard" hidden>
+                <h3 id="resultsTitle"></h3>
+                <p id="totalVotes"></p>
+
+                <div id="resultsList" class="results-list"></div>
+
+                <div class="chart-container">
+                    <canvas id="resultsChart" aria-label="Candidate vote counts"></canvas>
+                </div>
+            </div>
+        </section>
+
     </main>
 
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="js/dashboard.js"></script>
     <script src="js/dashboard.js"></script>
 
 </body>

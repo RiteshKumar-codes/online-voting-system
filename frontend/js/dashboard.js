@@ -298,5 +298,183 @@ async function submitVote() {
 
 confirmVoteBtn.addEventListener("click", submitVote);
 
+
+const resultsElectionList =
+    document.getElementById("resultsElectionList");
+
+const resultsMessage =
+    document.getElementById("resultsMessage");
+
+const resultsDashboard =
+    document.getElementById("resultsDashboard");
+
+const resultsTitle =
+    document.getElementById("resultsTitle");
+
+const totalVotesElement =
+    document.getElementById("totalVotes");
+
+const resultsList =
+    document.getElementById("resultsList");
+
+let resultsChart = null;
+
+// Load elections as choices for the results dashboard
+async function loadResultsElectionChoices() {
+    resultsElectionList.replaceChildren();
+    resultsMessage.textContent = "Loading elections...";
+
+    try {
+        const data = await apiRequest(`${API_URL}/elections`);
+
+        const elections = Array.isArray(data)
+            ? data
+            : data.elections;
+
+        if (!Array.isArray(elections) || elections.length === 0) {
+            resultsMessage.textContent = "No elections found.";
+            return;
+        }
+
+        resultsMessage.textContent = "";
+
+        elections.forEach((election) => {
+            const button = document.createElement("button");
+            button.textContent = `View results: ${election.title}`;
+
+            button.addEventListener("click", () => {
+                loadElectionResults(election);
+            });
+
+            const card = document.createElement("article");
+            card.className = "election-card";
+
+            const heading = document.createElement("h3");
+            heading.textContent = election.title;
+
+            card.append(heading, button);
+            resultsElectionList.appendChild(card);
+        });
+    } catch (error) {
+        resultsMessage.textContent = error.message;
+    }
+}
+
+// Fetch and display one election's results
+async function loadElectionResults(election) {
+    resultsDashboard.hidden = true;
+    resultsList.replaceChildren();
+    resultsMessage.textContent = "Loading results...";
+
+    try {
+        const data = await apiRequest(
+            `${API_URL}/results/election/${election.id}`
+        );
+
+        // Expected API response:
+        // { election, totalVotes, results: [...] }
+        const results = data.results;
+
+        if (!Array.isArray(results)) {
+            throw new Error(
+                "Unexpected results response. Check your backend API."
+            );
+        }
+
+        resultsTitle.textContent =
+            data.election?.title || election.title;
+
+        totalVotesElement.textContent =
+            `Total votes: ${Number(data.totalVotes ?? 0)}`;
+
+        resultsMessage.textContent = "";
+
+        if (results.length === 0) {
+            resultsList.textContent =
+                "No candidates or results are available.";
+            resultsDashboard.hidden = false;
+            destroyResultsChart();
+            return;
+        }
+
+        renderResults(results);
+        renderResultsChart(results);
+
+        resultsDashboard.hidden = false;
+    } catch (error) {
+        resultsMessage.textContent = error.message;
+    }
+}
+
+// Render candidate counts as accessible text
+function renderResults(results) {
+    resultsList.replaceChildren();
+
+    results.forEach((candidate) => {
+        const row = document.createElement("div");
+        row.className = "result-row";
+
+        const name = document.createElement("strong");
+        name.textContent = candidate.candidate_name;
+
+        const votes = document.createElement("span");
+        votes.textContent =
+            `${Number(candidate.vote_count)} vote(s)`;
+
+        row.append(name, votes);
+        resultsList.appendChild(row);
+    });
+}
+
+// Destroy any old chart before drawing another
+function destroyResultsChart() {
+    if (resultsChart) {
+        resultsChart.destroy();
+        resultsChart = null;
+    }
+}
+
+// Draw candidate vote counts
+function renderResultsChart(results) {
+    const canvas = document.getElementById("resultsChart");
+
+    if (typeof Chart === "undefined") {
+        resultsMessage.textContent =
+            "Chart library did not load. Results are shown as text.";
+        return;
+    }
+
+    destroyResultsChart();
+
+    resultsChart = new Chart(canvas, {
+        type: "bar",
+        data: {
+            labels: results.map(
+                (candidate) => candidate.candidate_name
+            ),
+            datasets: [{
+                label: "Votes",
+                data: results.map(
+                    (candidate) => Number(candidate.vote_count)
+                )
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        precision: 0
+                    }
+                }
+            }
+        }
+    });
+}
+
+// Load results choices when the dashboard opens
+loadResultsElectionChoices();
+
 // Start
 loadElections();
